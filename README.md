@@ -74,17 +74,7 @@ docker compose up -d
 | nomic-embed-text  | Embeddings | Text embeddings (137M)          |
 | mxbai-embed-large | Embeddings | High-quality embeddings (334M)  |
 
-**Pull Models**:
-```bash
-# LLM Models
-docker exec ai-toolkit-ollama-1 ollama pull mistral
-docker exec ai-toolkit-ollama-1 ollama pull llama3.1
-docker exec ai-toolkit-ollama-1 ollama pull qwen2.5
-
-# Embedding Models
-docker exec ai-toolkit-ollama-1 ollama pull nomic-embed-text
-docker exec ai-toolkit-ollama-1 ollama pull mxbai-embed-large
-```
+See [Installing Models](#installing-models) section below for installation commands.
 
 **GPU Support**: Uncomment the GPU section in docker-compose.yml for NVIDIA GPU acceleration
 
@@ -111,15 +101,7 @@ docker exec ai-toolkit-ollama-1 ollama pull mxbai-embed-large
 | faster-whisper-base     | STT  | Fast transcription          |
 | faster-whisper-large-v3 | STT  | Best accuracy               |
 
-**Download Models**:
-```bash
-# TTS Model
-docker compose exec speaches uv tool run speaches-cli model download speaches-ai/Kokoro-82M-v1.0-ONNX
-
-# STT Models
-docker compose exec speaches uv tool run speaches-cli model download Systran/faster-whisper-small
-docker compose exec speaches uv tool run speaches-cli model download Systran/faster-whisper-large-v3
-```
+See [Installing Models](#installing-models) section below for installation commands.
 
 **GPU Support**: Change image tag to `latest-cuda` and add GPU device mapping for NVIDIA acceleration
 
@@ -246,21 +228,21 @@ docker compose exec <container-name> ollama rm <model-name>
 
 ### Speaches Models
 
-Use `docker compose exec speaches uv tool run speaches-cli model download <model-name>` for speech models:
+Use `docker compose exec <container-name> uv tool run speaches-cli model download <model-name>` for speech models:
 
 ```bash
 # Text-to-Speech (TTS)
-docker compose exec speaches uv tool run speaches-cli model download speaches-ai/Kokoro-82M-v1.0-ONNX
+docker compose exec <container-name> uv tool run speaches-cli model download speaches-ai/Kokoro-82M-v1.0-ONNX
 
 # Speech-to-Text (STT) - Choose based on your needs
-docker compose exec speaches uv tool run speaches-cli model download Systran/faster-whisper-small
-docker compose exec speaches uv tool run speaches-cli model download Systran/faster-whisper-large-v3
+docker compose exec <container-name> uv tool run speaches-cli model download Systran/faster-whisper-small
+docker compose exec <container-name> uv tool run speaches-cli model download Systran/faster-whisper-large-v3
 
 # List installed models
-docker compose exec speaches uv tool run speaches-cli model ls
+docker compose exec <container-name> uv tool run speaches-cli model ls
 
 # List available models:
-docker compose exec speaches uv tool run speaches-cli registry ls
+docker compose exec <container-name> uv tool run speaches-cli registry ls
 ```
 
 ### Why Use `docker compose exec`?
