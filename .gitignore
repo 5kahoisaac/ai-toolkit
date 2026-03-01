@@ -1,0 +1,15 @@
+.DS_Store
+
+# env
+*.env*
+!.env.example
+
+# ide
+.idea/
+.vscode/
+
+# volumes
+notebook_data/
+surreal_data/
+hf-hub-cache/
+ollama_models/

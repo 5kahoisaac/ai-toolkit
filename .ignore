@@ -1,0 +1,6 @@
+*.env*
+
+notebook_data/
+surreal_data/
+hf-hub-cache/
+ollama_models/
