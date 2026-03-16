@@ -6,7 +6,7 @@ A complete privacy-focused Docker Compose setup for running AI tools locally. No
 
 This project is based on the [Open Notebook Docker Compose examples](https://github.com/lfnovo/open-notebook/blob/main/examples/README.md) with customizations and improvements for easier local deployment.
 
-The current setup includes core AI infrastructure services (Open Notebook, Ollama, Speaches, SurrealDB). More AI tools will be added to this Docker Compose setup for a comprehensive quick-start AI toolkit.
+The current setup includes core AI infrastructure services (Open Notebook, Ollama, Speaches, SurrealDB) plus experimental tools (OpenPlaud). More AI tools will be added to this Docker Compose setup for a comprehensive quick-start AI toolkit.
 
 ## Overview
 
@@ -125,6 +125,55 @@ See [Installing Models](#installing-models) section below for installation comma
 
 ---
 
+### OpenPlaud (Experimental)
+
+> ⚠️ **Experimental**: This service is currently under testing and may be removed in the future if it doesn't meet requirements or proves insufficient (currently experiencing timeouts when processing large recordings).
+
+**Purpose**: Self-hosted AI transcription interface for Plaud Note devices
+
+**What it does**:
+- Replace Plaud's $20/month AI subscription with your own OpenAI-compatible API keys
+- Transcribe recordings from Plaud Note devices
+- Support for multiple AI providers (OpenAI, Groq, Together AI, OpenRouter, local models)
+- Browser-based transcription with Transformers.js (zero API costs)
+- Auto-sync recordings from Plaud devices
+- Multiple export formats (JSON, TXT, SRT, VTT)
+
+**Access**: http://localhost:3000
+
+**Configuration**:
+- Requires PostgreSQL database
+- Connects to OpenAI-compatible APIs for transcription
+- Encrypted credentials storage with AES-256-GCM
+
+**Repository**: [OpenPlaud on GitHub](https://github.com/openplaud/openplaud)
+
+---
+
+### PostgreSQL
+
+**Purpose**: Relational database for OpenPlaud
+
+**What it does**:
+- Stores user accounts, recordings metadata, and transcriptions
+- PostgreSQL 16 with Alpine Linux (lightweight)
+- Persistent storage via Docker volume
+
+**Access**: `localhost:5432`
+
+**Default Credentials**:
+- User: `postgres`
+- Password: `postgres`
+- Database: `openplaud`
+
+**Connection**:
+```bash
+# Connect via psql
+docker compose exec postgresdb psql -U postgres -d openplaud
+```
+
+---
+
 ### Cloudflared (Optional)
 
 **Purpose**: Secure tunnel for remote access
@@ -173,6 +222,17 @@ Copy `.env.example` to `.env` and configure the following variables:
 | `API_URL`                | Custom API URL for Open Notebook (advanced use)                                                                                                                                  | `https://api.example.com` |
 | `OPEN_NOTEBOOK_PASSWORD` | Password protection for Open Notebook UI                                                                                                                                         | `your-secure-password`    |
 
+#### Experimental
+
+| Variable               | Description                                                        | Example                 |
+|------------------------|--------------------------------------------------------------------|-------------------------|
+| `DEFAULT_STORAGE_TYPE` | Storage backend for OpenPlaud (`local` or `s3`)                    | `local`                 |
+| `ENCRYPTION_KEY`       | AES-256-GCM encryption key for credentials (generate with openssl) | `openssl rand -hex 32`  |
+| `BETTER_AUTH_SECRET`   | Authentication secret key (generate with openssl)                  | `openssl rand -hex 32`  |
+| `OPEN_PLAUD_APP_URL`   | Public URL for OpenPlaud app                                       | `http://localhost:3000` |
+
+> ⚠️ **Note**: OpenPlaud is experimental. Generate unique keys for `ENCRYPTION_KEY` and `BETTER_AUTH_SECRET` using `openssl rand -hex 32`.
+
 **Important**: Never commit your `.env` file to version control. It contains sensitive credentials.
 
 ### Open Notebook Setup
@@ -190,6 +250,48 @@ Copy `.env.example` to `.env` and configure the following variables:
    - Base URL: `http://host.docker.internal:8969/v1` (macOS/Windows)
    - Test Connection and Discover Models
 
+### OpenPlaud Setup (Experimental)
+
+1. **Generate encryption keys**:
+   ```bash
+   # Generate BETTER_AUTH_SECRET
+   openssl rand -hex 32
+
+   # Generate ENCRYPTION_KEY
+   openssl rand -hex 32
+   ```
+
+2. **Configure environment variables**:
+   - Copy the generated keys to your `.env` file:
+     - `BETTER_AUTH_SECRET` - Authentication secret
+     - `ENCRYPTION_KEY` - AES-256-GCM encryption for API keys
+     - `OPEN_PLAUD_APP_URL` - Set to `http://localhost:3000` (or your tunnel URL)
+
+3. **Restart OpenPlaud services**:
+   ```bash
+   docker compose up -d postgresdb open_plaud
+   ```
+
+4. **Create an account**:
+   - Open http://localhost:3000 in your browser
+   - Follow the onboarding wizard to create your account
+   - No email verification required for local setup
+
+5. **Configure AI provider**:
+   - Go to Settings → AI Providers
+   - Add your OpenAI-compatible API (OpenAI, Groq, Together AI, etc.)
+   - For local models: use your Ollama endpoint with an OpenAI-compatible wrapper
+
+6. **Connect Plaud account** (optional):
+   - Go to Settings → Sync
+   - Enter your Plaud.ai credentials to auto-sync recordings
+   - Recordings will be downloaded automatically based on your sync interval
+
+7. **Test transcription**:
+   - Upload a test recording or use auto-sync
+   - Select your configured AI provider
+   - Verify transcription completes successfully
+
 ## Project Structure
 
 ```
@@ -198,7 +300,9 @@ ai-toolkit/
 ├── .env.example            # Example environment variables
 ├── .env                    # Your configuration (gitignored)
 ├── notebook_data/          # Open Notebook persistent data
-└── surreal_data/           # SurrealDB persistent data
+├── surreal_data/           # SurrealDB persistent data
+├── openplaud/              # OpenPlaud submodule (experimental)
+└── openplaud_data/         # OpenPlaud PostgreSQL data (experimental)
 ```
 
 ## Installing Models
@@ -320,6 +424,7 @@ docker compose exec speaches uv tool run speaches-cli model list
 - [Ollama Documentation](https://github.com/ollama/ollama)
 - [Speaches Documentation](https://github.com/speaches-ai/speaches)
 - [SurrealDB Documentation](https://surrealdb.com/docs)
+- [OpenPlaud Documentation](https://github.com/openplaud/openplaud)
 
 ## License
 

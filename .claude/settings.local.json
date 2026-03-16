@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git submodule status)",
+      "Bash(git config --file .gitmodules --get-regexp url)"
+    ]
+  }
+}
