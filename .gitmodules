@@ -1,0 +1,3 @@
+[submodule "openplaud"]
+	path = openplaud
+	url = git@github.com:5kahoisaac/openplaud.git
