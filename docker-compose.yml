@@ -101,9 +101,7 @@ services:
     pull_policy: always
 
   open_plaud:
-    build:
-      context: ./openplaud
-      dockerfile: Dockerfile
+    image: ghcr.io/openplaud/openplaud-latest
     container_name: openplaud-app
     # ports:
     #   - "3000:3000"
